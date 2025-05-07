@@ -1,2 +1,4 @@
 # No external dependencies required as tkinter and csv are built-in Python modules
-# Python 3.x is required 
+# Python 3.x is required
+pandas>=2.0.0
+openpyxl>=3.0.0 
