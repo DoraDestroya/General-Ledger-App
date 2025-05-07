@@ -1,4 +1,4 @@
-# General Ledger Application
+# General Ledger Application-William Macey Arkansas Accounting Student
 
 A Python-based general ledger application with a graphical user interface that allows users to manage accounting transactions, view T-accounts, and maintain a general ledger. Made for Arkansas AI foundry Hackathon. Used Cursor to code and create the interface.
 Created for small business owners to have a free General Ledger that can export to financial statements.
