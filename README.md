@@ -1,6 +1,6 @@
 # General Ledger Application
 
-A Python-based general ledger application with a graphical user interface that allows users to manage accounting transactions, view T-accounts, and maintain a general ledger.
+A Python-based general ledger application with a graphical user interface that allows users to manage accounting transactions, view T-accounts, and maintain a general ledger. Made for Arkansas AI Foundary Hackacthon
 
 ## Features
 
