@@ -10,18 +10,23 @@ A Python-based general ledger application with a graphical user interface that a
 - Save and load ledger data in CSV format
 - User-friendly GUI interface
 
-## Requirements
+## Download
 
-- Python 3.x
-- tkinter (usually comes with Python)
-- csv (built-in Python module)
+You can download the latest version of the application from the [Releases](https://github.com/DoraDestroya/General-Ledger-App/releases) page.
 
-## Installation
+### System Requirements
+- macOS 10.13 or later
+- Windows 10 or later
+- Linux (Ubuntu 20.04 or later)
+
+## Development Setup
+
+If you want to run the application from source:
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/general-ledger.git
-cd general-ledger
+git clone https://github.com/DoraDestroya/General-Ledger-App.git
+cd General-Ledger-App
 ```
 
 2. Install the required dependencies:
@@ -29,12 +34,28 @@ cd general-ledger
 pip install -r requirements.txt
 ```
 
-## Usage
-
-Run the application:
+3. Run the application:
 ```bash
 python general_ledger.py
 ```
+
+### Building from Source
+
+To create your own executable:
+
+1. Install PyInstaller:
+```bash
+pip install pyinstaller
+```
+
+2. Build the executable:
+```bash
+pyinstaller general_ledger.spec
+```
+
+The executable will be created in the `dist` directory.
+
+## Usage
 
 ### Adding Transactions
 1. Enter the transaction details in the input fields:
