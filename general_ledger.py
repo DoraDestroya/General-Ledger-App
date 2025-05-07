@@ -76,15 +76,50 @@ class LedgerApp:
         
         # Predefined accounts
         self.accounts = [
+            # Assets
             "Cash",
-            "Sales Revenue",
-            "COGS",
-            "Deferred Revenue",
-            "Accounts Payable",
             "Accounts Receivable",
-            "Interest Expense",
+            "Inventory",
+            "Prepaid Expenses",
+            "Equipment",
+            "Buildings",
+            "Land",
+            "Accumulated Depreciation",
+            
+            # Liabilities
+            "Accounts Payable",
+            "Notes Payable",
+            "Salaries Payable",
+            "Interest Payable",
+            "Unearned Revenue",
+            "Deferred Revenue",
+            
+            # Equity
+            "Common Stock",
+            "Retained Earnings",
+            "Owner's Capital",
+            "Owner's Draw",
+            
+            # Revenue
+            "Sales Revenue",
+            "Service Revenue",
             "Interest Revenue",
-            "Interest Payable"
+            "Rent Revenue",
+            
+            # Expenses
+            "COGS",
+            "Salaries Expense",
+            "Rent Expense",
+            "Utilities Expense",
+            "Insurance Expense",
+            "Depreciation Expense",
+            "Interest Expense",
+            "Advertising Expense",
+            "Office Supplies Expense",
+            "Maintenance Expense",
+            
+            # Custom Account (will be handled separately)
+            "Custom Account"
         ]
 
         # Create notebook for tabs
@@ -94,14 +129,19 @@ class LedgerApp:
         # Create tabs
         self.transactions_tab = ttk.Frame(self.notebook)
         self.statements_tab = ttk.Frame(self.notebook)
+        self.tax_export_tab = ttk.Frame(self.notebook)  # New tax export tab
         self.notebook.add(self.transactions_tab, text='Transactions')
         self.notebook.add(self.statements_tab, text='Financial Statements')
+        self.notebook.add(self.tax_export_tab, text='Tax Export')  # Add new tab
 
         # --- Transactions Tab ---
         self.setup_transactions_tab()
         
         # --- Financial Statements Tab ---
         self.setup_statements_tab()
+
+        # --- Tax Export Tab ---
+        self.setup_tax_export_tab()
 
     def setup_transactions_tab(self):
         # Input Section
@@ -117,6 +157,19 @@ class LedgerApp:
         self.account_dropdown = ttk.Combobox(input_frame, textvariable=self.account_var, values=self.accounts, state="readonly")
         self.account_dropdown.grid(row=1, column=1, padx=5, pady=5)
         self.account_dropdown.set(self.accounts[0])  # Set default value
+        
+        # Add custom account entry field
+        self.custom_account_var = tk.StringVar()
+        self.custom_account_entry = ttk.Entry(input_frame, textvariable=self.custom_account_var)
+        self.custom_account_entry.grid(row=1, column=2, padx=5, pady=5)
+        self.custom_account_entry.grid_remove()  # Initially hidden
+        
+        # Add toggle button for custom account
+        self.use_custom_account = tk.BooleanVar(value=False)
+        self.custom_account_check = ttk.Checkbutton(input_frame, text="Custom Account", 
+                                                  variable=self.use_custom_account,
+                                                  command=self.toggle_custom_account)
+        self.custom_account_check.grid(row=1, column=3, padx=5, pady=5)
 
         ttk.Label(input_frame, text="Debit:").grid(row=2, column=0, padx=5, pady=5)
         self.debit_entry = ttk.Entry(input_frame)
@@ -200,9 +253,56 @@ class LedgerApp:
                                  command=self.update_financial_statements)
         update_button.pack(pady=5)
 
+    def setup_tax_export_tab(self):
+        # Create frames for each tax form
+        form1120_frame = ttk.LabelFrame(self.tax_export_tab, text="Form 1120 (C Corporation)")
+        form1120_frame.pack(fill='both', expand=True, padx=5, pady=5)
+        
+        form1065_frame = ttk.LabelFrame(self.tax_export_tab, text="Form 1065 (Partnership)")
+        form1065_frame.pack(fill='both', expand=True, padx=5, pady=5)
+
+        # Form 1120 Export
+        self.form1120_tree = ttk.Treeview(form1120_frame, columns=("Line", "Description", "Amount"))
+        self.form1120_tree.heading("#1", text="Line")
+        self.form1120_tree.heading("#2", text="Description")
+        self.form1120_tree.heading("#3", text="Amount")
+        self.form1120_tree.pack(fill='both', expand=True, padx=5, pady=5)
+
+        # Form 1065 Export
+        self.form1065_tree = ttk.Treeview(form1065_frame, columns=("Line", "Description", "Amount"))
+        self.form1065_tree.heading("#1", text="Line")
+        self.form1065_tree.heading("#2", text="Description")
+        self.form1065_tree.heading("#3", text="Amount")
+        self.form1065_tree.pack(fill='both', expand=True, padx=5, pady=5)
+
+        # Export buttons
+        button_frame = ttk.Frame(self.tax_export_tab)
+        button_frame.pack(fill='x', padx=5, pady=5)
+
+        export_1120_button = ttk.Button(button_frame, text="Export Form 1120", 
+                                      command=self.export_form_1120)
+        export_1120_button.pack(side='left', padx=5)
+
+        export_1065_button = ttk.Button(button_frame, text="Export Form 1065", 
+                                      command=self.export_form_1065)
+        export_1065_button.pack(side='left', padx=5)
+
+        update_tax_button = ttk.Button(button_frame, text="Update Tax Forms", 
+                                     command=self.update_tax_forms)
+        update_tax_button.pack(side='left', padx=5)
+
+    def toggle_custom_account(self):
+        if self.use_custom_account.get():
+            self.account_dropdown.grid_remove()
+            self.custom_account_entry.grid()
+        else:
+            self.custom_account_entry.grid_remove()
+            self.account_dropdown.grid()
+            self.custom_account_var.set("")
+
     def add_transaction_ui(self):
         date = self.date_entry.get()
-        account = self.account_var.get()  # Get selected account from dropdown
+        account = self.custom_account_var.get() if self.use_custom_account.get() else self.account_var.get()
         debit_str = self.debit_entry.get()
         credit_str = self.credit_entry.get()
         description = self.description_entry.get()
@@ -217,9 +317,12 @@ class LedgerApp:
             # Clear input fields after adding
             self.date_entry.delete(0, tk.END)
             self.account_dropdown.set(self.accounts[0])  # Reset dropdown to first account
+            self.custom_account_var.set("")  # Clear custom account entry
             self.debit_entry.delete(0, tk.END)
             self.credit_entry.delete(0, tk.END)
             self.description_entry.delete(0, tk.END)
+            self.use_custom_account.set(False)  # Reset custom account checkbox
+            self.toggle_custom_account()  # Update UI
         except ValueError:
             messagebox.showerror("Error", "Invalid debit or credit amount.")
 
@@ -291,6 +394,146 @@ class LedgerApp:
                 row['Category'],
                 f"${row['Amount']:.2f}"
             ))
+
+    def update_tax_forms(self):
+        # Update Form 1120
+        for item in self.form1120_tree.get_children():
+            self.form1120_tree.delete(item)
+        
+        # Get financial data
+        income_stmt = IncomeStatement(self.ledger)
+        balance_sheet = BalanceSheet(self.ledger)
+        
+        # Form 1120 data
+        form1120_data = [
+            ("1a", "Gross receipts or sales", income_stmt.revenue),
+            ("1b", "Returns and allowances", 0),  # Would need to track this separately
+            ("1c", "Net receipts or sales", income_stmt.revenue),
+            ("2", "Cost of goods sold", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                          for acc in ["COGS"])),
+            ("3", "Gross profit", income_stmt.revenue - sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                          for acc in ["COGS"])),
+            ("4", "Dividends", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                 for acc in ["Dividend Income"])),
+            ("5", "Interest", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                for acc in ["Interest Revenue"])),
+            ("6", "Gross rents", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                   for acc in ["Rent Revenue"])),
+            ("7", "Gross royalties", 0),  # Would need to track this separately
+            ("8", "Capital gain net income", 0),  # Would need to track this separately
+            ("9", "Net gain or loss from Form 4797", 0),  # Would need to track this separately
+            ("10", "Other income", 0),  # Would need to track this separately
+            ("11", "Total income", income_stmt.revenue),
+            ("12", "Compensation of officers", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                for acc in ["Salaries Expense"])),
+            ("13", "Salaries and wages", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                           for acc in ["Salaries Expense"])),
+            ("14", "Repairs and maintenance", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                for acc in ["Maintenance Expense"])),
+            ("15", "Bad debts", 0),  # Would need to track this separately
+            ("16", "Rents", sum(self.ledger.get_account_balances().get(acc, 0) 
+                              for acc in ["Rent Expense"])),
+            ("17", "Taxes and licenses", 0),  # Would need to track this separately
+            ("18", "Interest", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                 for acc in ["Interest Expense"])),
+            ("19", "Depreciation", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                     for acc in ["Depreciation Expense"])),
+            ("20", "Depletion", 0),  # Would need to track this separately
+            ("21", "Advertising", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                    for acc in ["Advertising Expense"])),
+            ("22", "Pension, profit-sharing, etc.", 0),  # Would need to track this separately
+            ("23", "Employee benefit programs", 0),  # Would need to track this separately
+            ("24", "Other deductions", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                         for acc in ["Office Supplies Expense", "Utilities Expense", 
+                                                   "Insurance Expense"])),
+            ("25", "Total deductions", income_stmt.expenses),
+            ("26", "Taxable income", income_stmt.net_income)
+        ]
+
+        for line, desc, amount in form1120_data:
+            self.form1120_tree.insert("", tk.END, values=(line, desc, f"${amount:.2f}"))
+
+        # Update Form 1065
+        for item in self.form1065_tree.get_children():
+            self.form1065_tree.delete(item)
+        
+        # Form 1065 data
+        form1065_data = [
+            ("1a", "Gross receipts or sales", income_stmt.revenue),
+            ("1b", "Returns and allowances", 0),  # Would need to track this separately
+            ("1c", "Net receipts or sales", income_stmt.revenue),
+            ("2", "Cost of goods sold", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                          for acc in ["COGS"])),
+            ("3", "Gross profit", income_stmt.revenue - sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                          for acc in ["COGS"])),
+            ("4", "Ordinary income (loss) from other partnerships", 0),  # Would need to track this separately
+            ("5", "Net farm profit (loss)", 0),  # Would need to track this separately
+            ("6", "Net gain (loss) from Form 4797", 0),  # Would need to track this separately
+            ("7", "Other income (loss)", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                           for acc in ["Interest Revenue", "Rent Revenue"])),
+            ("8", "Total income (loss)", income_stmt.revenue),
+            ("9", "Guaranteed payments to partners", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                      for acc in ["Salaries Expense"])),
+            ("10", "Compensation of partners", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                for acc in ["Salaries Expense"])),
+            ("11", "Salaries and wages", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                           for acc in ["Salaries Expense"])),
+            ("12", "Repairs and maintenance", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                                for acc in ["Maintenance Expense"])),
+            ("13", "Bad debts", 0),  # Would need to track this separately
+            ("14", "Rents", sum(self.ledger.get_account_balances().get(acc, 0) 
+                              for acc in ["Rent Expense"])),
+            ("15", "Taxes and licenses", 0),  # Would need to track this separately
+            ("16", "Interest", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                 for acc in ["Interest Expense"])),
+            ("17", "Depreciation", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                     for acc in ["Depreciation Expense"])),
+            ("18", "Depletion", 0),  # Would need to track this separately
+            ("19", "Retirement plans", 0),  # Would need to track this separately
+            ("20", "Employee benefit programs", 0),  # Would need to track this separately
+            ("21", "Other deductions", sum(self.ledger.get_account_balances().get(acc, 0) 
+                                         for acc in ["Office Supplies Expense", "Utilities Expense", 
+                                                   "Insurance Expense", "Advertising Expense"])),
+            ("22", "Total deductions", income_stmt.expenses),
+            ("23", "Ordinary business income (loss)", income_stmt.net_income)
+        ]
+
+        for line, desc, amount in form1065_data:
+            self.form1065_tree.insert("", tk.END, values=(line, desc, f"${amount:.2f}"))
+
+    def export_form_1120(self):
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+        )
+        if filepath:
+            try:
+                with open(filepath, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(["Line", "Description", "Amount"])
+                    for item in self.form1120_tree.get_children():
+                        values = self.form1120_tree.item(item)['values']
+                        writer.writerow(values)
+                messagebox.showinfo("Success", "Form 1120 data exported successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Error exporting Form 1120: {e}")
+
+    def export_form_1065(self):
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv"), ("All files", "*.*")]
+        )
+        if filepath:
+            try:
+                with open(filepath, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    writer.writerow(["Line", "Description", "Amount"])
+                    for item in self.form1065_tree.get_children():
+                        values = self.form1065_tree.item(item)['values']
+                        writer.writerow(values)
+                messagebox.showinfo("Success", "Form 1065 data exported successfully!")
+            except Exception as e:
+                messagebox.showerror("Error", f"Error exporting Form 1065: {e}")
 
     def save_ledger(self):
         filepath = filedialog.asksaveasfilename(

@@ -1,4 +1,11 @@
-# General Ledger v1.0.1
+# General Ledger v1.0.2
+
+## New Features
+- Added tax export functionality for Form 1120 (C Corporation)
+- Added tax export functionality for Form 1065 (Partnership)
+- New Tax Export tab in the interface
+- Automatic calculation of tax form line items
+- Export tax data to CSV format
 
 ## Features
 - Add and manage accounting transactions
@@ -6,6 +13,7 @@
 - Generate and display T-accounts
 - Save and load ledger data in CSV format
 - User-friendly GUI interface
+- Export to financial statements
 
 ## Downloads
 - [General Ledger for macOS](releases/General_Ledger_MacOS.zip)
@@ -23,14 +31,15 @@
 - Windows 10 or later (coming soon)
 
 ## Changes in this Release
-- Added standalone macOS application bundle
-- Improved GUI interface
-- Added application icon
-- Fixed file handling issues
+- Added tax export functionality
+- Improved account selection with custom account option
+- Added more common journal entry accounts
+- Enhanced financial statement generation
 
 ## Known Issues
 - First launch may require security permissions on macOS
 - Large transaction lists may take a moment to load
+- Some tax form line items require additional tracking for complete accuracy
 
 ## Support
 If you encounter any issues, please:
