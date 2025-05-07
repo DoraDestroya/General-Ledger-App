@@ -73,6 +73,19 @@ class LedgerApp:
         master.title("Accounting General Ledger")
 
         self.ledger = GeneralLedger()
+        
+        # Predefined accounts
+        self.accounts = [
+            "Cash",
+            "Sales Revenue",
+            "COGS",
+            "Deferred Revenue",
+            "Accounts Payable",
+            "Accounts Receivable",
+            "Interest Expense",
+            "Interest Revenue",
+            "Interest Payable"
+        ]
 
         # Create notebook for tabs
         self.notebook = ttk.Notebook(master)
@@ -100,8 +113,10 @@ class LedgerApp:
         self.date_entry.grid(row=0, column=1, padx=5, pady=5)
 
         ttk.Label(input_frame, text="Account:").grid(row=1, column=0, padx=5, pady=5)
-        self.account_entry = ttk.Entry(input_frame)
-        self.account_entry.grid(row=1, column=1, padx=5, pady=5)
+        self.account_var = tk.StringVar()
+        self.account_dropdown = ttk.Combobox(input_frame, textvariable=self.account_var, values=self.accounts, state="readonly")
+        self.account_dropdown.grid(row=1, column=1, padx=5, pady=5)
+        self.account_dropdown.set(self.accounts[0])  # Set default value
 
         ttk.Label(input_frame, text="Debit:").grid(row=2, column=0, padx=5, pady=5)
         self.debit_entry = ttk.Entry(input_frame)
@@ -187,7 +202,7 @@ class LedgerApp:
 
     def add_transaction_ui(self):
         date = self.date_entry.get()
-        account = self.account_entry.get()
+        account = self.account_var.get()  # Get selected account from dropdown
         debit_str = self.debit_entry.get()
         credit_str = self.credit_entry.get()
         description = self.description_entry.get()
@@ -201,7 +216,7 @@ class LedgerApp:
             self.update_financial_statements()
             # Clear input fields after adding
             self.date_entry.delete(0, tk.END)
-            self.account_entry.delete(0, tk.END)
+            self.account_dropdown.set(self.accounts[0])  # Reset dropdown to first account
             self.debit_entry.delete(0, tk.END)
             self.credit_entry.delete(0, tk.END)
             self.description_entry.delete(0, tk.END)
