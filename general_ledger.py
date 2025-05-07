@@ -70,7 +70,7 @@ class GeneralLedger:
 class LedgerApp:
     def __init__(self, master):
         self.master = master
-        master.title("Accounting General Ledger")
+        master.title("General Ledger V3")
 
         self.ledger = GeneralLedger()
         

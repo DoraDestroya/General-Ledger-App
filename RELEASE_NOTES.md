@@ -1,4 +1,4 @@
-# General Ledger v1.0.2
+# General Ledger V3 v1.0.2
 
 ## New Features
 - Added tax export functionality for Form 1120 (C Corporation)
@@ -16,7 +16,7 @@
 - Export to financial statements
 
 ## Downloads
-- [General Ledger for macOS](releases/General_Ledger_MacOS.zip)
+- [General Ledger V3 for macOS](releases/General_Ledger_V3_MacOS.zip)
 
 ## Installation Instructions
 1. Download the ZIP file for your operating system
@@ -35,6 +35,7 @@
 - Improved account selection with custom account option
 - Added more common journal entry accounts
 - Enhanced financial statement generation
+- Renamed application to General Ledger V3
 
 ## Known Issues
 - First launch may require security permissions on macOS
